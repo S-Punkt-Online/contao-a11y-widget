@@ -14,7 +14,7 @@ Ein einfaches Accessibility Widget als Frontend-Modul für Contao 5.
 
 ## Installation
 
-composer require weba11y/contao-a11y-widget
+composer require s-punkt-online/contao-a11y-widget
 
 ## Verwendung
 

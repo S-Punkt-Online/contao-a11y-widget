@@ -1,5 +1,5 @@
 {
-  "name": "weba11y/contao-a11y-widget",
+  "name": "s-punkt-online/contao-a11y-widget",
   "description": "Ein barrierearmes Accessibility Widget als Frontend-Modul für Contao.",
   "type": "contao-bundle",
   "license": "MIT",
