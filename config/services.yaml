@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Weba11y\ContaoA11yWidget\:
+    resource: '../src/'

@@ -1,0 +1,261 @@
+
+:root {
+    --a11y-font-scale: 100%;
+}
+
+html {
+    font-size: var(--a11y-font-scale);
+}
+
+/* Schwebende Aktionstaste (FAB) */
+[data-a11y-fab] {
+    position: fixed;
+    inset: auto 1rem 1rem auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #4D58FF;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0.375rem 1.125rem rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    user-select: none;
+    transition-duration: 0.3s;
+}
+[data-a11y-fab]:hover {
+    background-color: rgba(77, 88, 255, 0.9);
+    transition-duration: 0.3s;
+}
+
+[data-a11y-fab]:focus-visible {
+    outline: 0.1875rem solid #ffd54f;
+    outline-offset: 0.1875rem;
+}
+
+/* Icon im FAB (falls SVG verwendet wird) */
+[data-a11y-fab] svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Seitenpanel */
+[data-a11y-panel] {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    max-width: 100%;
+    height: 100dvh;
+
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+
+    background: #fff;
+    color: #2b3136;
+
+    box-shadow: -1rem 0 2.5rem rgba(0, 0, 0, 0.18);
+
+    z-index: 10001;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+body.dark-mode [data-a11y-panel] {
+    background: #2b3136;
+    color: #fefefe;
+}
+
+[data-a11y-panel][aria-hidden="false"] {
+    transform: translateX(0);
+}
+
+.a11y-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.125rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .a11y-panel__header {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.a11y-panel__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.a11y-panel__content {
+    padding: 0.75rem 1.125rem 1.25rem;
+    overflow: auto;
+}
+
+.a11y-section {
+    margin: 0.625rem 0 0.875rem;
+}
+
+.a11y-section h3, .a11y-section .h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* Buttons (Spans) */
+.a11y-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    user-select: none;
+}
+
+body.dark-mode .a11y-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.a11y-btn[aria-pressed=true] {
+    outline: 0.125rem solid #4D58FF;
+    outline-offset: 0.125rem;
+}
+
+.a11y-btn:focus-visible {
+    outline: 0.1875rem solid #ffd54f;
+    outline-offset: 0.1875rem;
+}
+
+.a11y-btn-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Toggles (als Switches) — stabil bei langen Texten */
+.a11y-toggle {
+    /* Grid verhindert das Schrumpfen des Schalters; Text bekommt die restliche Breite */
+    display: grid;
+    grid-template-columns: auto 1fr;
+    /* 1) Schalter, 2) Text */
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    max-inline-size: 100%;
+}
+
+body.dark-mode .a11y-toggle {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.a11y-toggle input {
+    appearance: none;
+    inline-size: 2.75rem;
+    /* feste Breite */
+    block-size: 1.625rem;
+    /* feste Höhe */
+    border-radius: 999px;
+    background: #bbb;
+    position: relative;
+    outline: none;
+    transition: background 0.2s;
+    flex: none;
+    /* falls irgendwo Flex greift */
+}
+
+.a11y-toggle input::after {
+    content: "";
+    position: absolute;
+    top: 0.3125rem;
+    left: 0.3125rem;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.a11y-toggle input:checked {
+    background: #4D58FF;
+}
+
+.a11y-toggle input:checked::after {
+    /* 44 - 26 = 18 → Weg des Knopfes */
+    transform: translateX(1.125rem);
+}
+
+.a11y-toggle span {
+    min-inline-size: 0;
+    /* erlaubt Umbruch */
+    white-space: normal;
+    overflow-wrap: anywhere;
+    /* bricht sehr lange Wörter */
+}
+
+/* ---- Effekte auf der Seite ---- */
+/* Sans-serif */
+body.a11y-sans {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Links hervorheben */
+body.a11y-highlight-links a {
+    text-decoration: underline !important;
+    text-underline-offset: 0.125rem;
+    font-weight: 700;
+    outline-offset: 0.125rem;
+}
+
+body.a11y-highlight-links a:focus-visible {
+    outline: 0.1875rem solid #ffd54f !important;
+}
+
+/* Lesemodus (ohne ablenkende Elemente) */
+body.a11y-reader-mode img,
+body.a11y-reader-mode picture,
+body.a11y-reader-mode video,
+body.a11y-reader-mode canvas,
+body.a11y-reader-mode iframe,
+body.a11y-reader-mode [data-decorative],
+body.a11y-reader-mode [aria-hidden=true] {
+    display: none !important;
+}
+
+body.a11y-reader-mode * {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.a11y-reader-mode [style*=background-image] {
+    background-image: none !important;
+}
+
+/* Backdrop zum Schließen bei Klick außerhalb */
+[data-a11y-backdrop] {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(0);
+    /* 0 genügt; px nicht nötig */
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10000;
+}
+
+[data-a11y-backdrop][data-open=true] {
+    opacity: 0.25;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+/* The End */
