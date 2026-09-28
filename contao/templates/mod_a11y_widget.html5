@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 
-<div class="a11y-widget" data-a11y-widget>
+<div class="a11y-widget a11y-widget--<?= $this->position ?> a11y-widget--<?= $this->colorScheme ?>" data-a11y-widget<?php if ($this->accentStyle): ?> style="<?= $this->accentStyle ?>"<?php endif; ?>>
 
   <button
     type="button"
@@ -44,8 +44,6 @@
               <button type="button" data-a11y-font-reset class="a11y-btn" aria-label="<?= $this->fontResetLabel ?>">100%</button>
               <button type="button" data-a11y-font-inc class="a11y-btn" aria-label="<?= $this->fontIncreaseLabel ?>">A+</button>
             </div>
-
-            <p class="a11y-sr-only" data-a11y-status aria-live="polite" data-a11y-status-prefix="<?= $this->fontTitle ?>"></p>
           </div>
         <?php endif; ?>
 
@@ -82,7 +80,40 @@
           </div>
         <?php endif; ?>
 
+        <?php if ($this->enableSpacing): ?>
+          <div class="a11y-section">
+            <h3><?= $this->spacingTitle ?></h3>
+
+            <label class="a11y-toggle">
+              <input data-a11y-spacing type="checkbox" role="switch">
+              <span><?= $this->spacingText ?></span>
+            </label>
+          </div>
+        <?php endif; ?>
+
+        <?php if ($this->enableContrast): ?>
+          <div class="a11y-section">
+            <h3><?= $this->contrastTitle ?></h3>
+
+            <label class="a11y-toggle">
+              <input data-a11y-contrast type="checkbox" role="switch">
+              <span><?= $this->contrastText ?></span>
+            </label>
+          </div>
+        <?php endif; ?>
+
+        <div class="a11y-panel__footer">
+          <button type="button" data-a11y-reset-all class="a11y-btn a11y-btn--block"><?= $this->resetLabel ?></button>
+        </div>
+
       </div>
+
+      <p
+        class="a11y-sr-only"
+        data-a11y-status
+        aria-live="polite"
+        data-a11y-status-prefix="<?= $this->fontTitle ?>"
+        data-a11y-reset-status="<?= $this->resetStatus ?>"></p>
     </div>
   </dialog>
 </div>

@@ -12,7 +12,18 @@
 	const PAGE_CLASSES = {
 		reader: 'a11y-reader-mode',
 		links: 'a11y-highlight-links',
-		sans: 'a11y-sans'
+		sans: 'a11y-sans',
+		spacing: 'a11y-text-spacing',
+		contrast: 'a11y-high-contrast'
+	};
+
+	const DEFAULTS = {
+		font: 100,
+		reader: false,
+		links: false,
+		sans: false,
+		spacing: false,
+		contrast: false
 	};
 
 	const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -35,12 +46,11 @@
 
 	const stored = load();
 
-	const state = {
-		font: clamp(Number(stored.font) || 100, FONT_MIN, FONT_MAX),
-		reader: !!stored.reader,
-		links: !!stored.links,
-		sans: !!stored.sans
-	};
+	const state = { font: clamp(Number(stored.font) || DEFAULTS.font, FONT_MIN, FONT_MAX) };
+
+	for (const key of Object.keys(PAGE_CLASSES)) {
+		state[key] = !!stored[key];
+	}
 
 	const save = () => {
 		try {
@@ -69,8 +79,29 @@
 		}
 	}
 
+	const pausedVideos = new Set();
+
+	// Modus ohne Ablenkungen: laufende und automatisch startende Videos anhalten, beim Ausschalten fortsetzen
+	function applyMedia() {
+		if (!document.body) return;
+
+		document.querySelectorAll('video').forEach((video) => {
+			if (state.reader) {
+				if (!video.paused || video.autoplay) {
+					video.autoplay = false;
+					video.pause();
+					pausedVideos.add(video);
+				}
+			} else if (pausedVideos.has(video)) {
+				pausedVideos.delete(video);
+				video.play().catch(() => {});
+			}
+		});
+	}
+
 	function applyToPage() {
 		applyFontSize();
+		applyMedia();
 
 		for (const [key, className] of Object.entries(PAGE_CLASSES)) {
 			root.classList.toggle(className, state[key]);
@@ -125,12 +156,13 @@
 		const fontDec = $('[data-a11y-font-dec]');
 		const fontReset = $('[data-a11y-font-reset]');
 		const status = $('[data-a11y-status]');
+		const resetAll = $('[data-a11y-reset-all]');
 
-		const toggles = {
-			reader: $('[data-a11y-reader]'),
-			links: $('[data-a11y-links]'),
-			sans: $('[data-a11y-sans]')
-		};
+		const toggles = {};
+
+		for (const key of Object.keys(PAGE_CLASSES)) {
+			toggles[key] = $('[data-a11y-' + key + ']');
+		}
 
 		// Ältere, angepasste Templates nutzen <aside> + Backdrop-Div statt <dialog>
 		const isDialog = typeof panel.showModal === 'function';
@@ -159,7 +191,7 @@
 			}
 
 			setTimeout(() => {
-				const firstFocus = fontDec || fontReset || fontInc || toggles.reader || toggles.links || toggles.sans || closeBtn;
+				const firstFocus = fontDec || fontReset || fontInc || Object.values(toggles).find(Boolean) || closeBtn;
 				if (firstFocus) firstFocus.focus();
 			}, 0);
 
@@ -213,19 +245,18 @@
 			backdrop.addEventListener('click', closePanel);
 		}
 
-		function announceFont() {
-			if (!status) return;
-
-			const prefix = status.dataset.a11yStatusPrefix || '';
-			const text = (prefix ? prefix + ': ' : '') + state.font + ' %';
+		function announce(text) {
+			if (!status || !text) return;
 
 			// Gleicher Text (z. B. am Minimum/Maximum) würde sonst nicht erneut angesagt
-			status.textContent = status.textContent === text ? text + ' ' : text;
+			status.textContent = status.textContent === text ? text + '\u00a0' : text;
 		}
 
 		function changeFont(font) {
 			update({ font: clamp(font, FONT_MIN, FONT_MAX) });
-			announceFont();
+
+			const prefix = status ? status.dataset.a11yStatusPrefix || '' : '';
+			announce((prefix ? prefix + ': ' : '') + state.font + ' %');
 		}
 
 		onActivate(fab, () => {
@@ -237,6 +268,11 @@
 		onActivate(fontInc, () => changeFont(state.font + FONT_STEP));
 		onActivate(fontDec, () => changeFont(state.font - FONT_STEP));
 		onActivate(fontReset, () => changeFont(100));
+
+		onActivate(resetAll, () => {
+			update(DEFAULTS);
+			announce(status ? status.dataset.a11yResetStatus : '');
+		});
 
 		for (const [key, toggle] of Object.entries(toggles)) {
 			if (toggle) {

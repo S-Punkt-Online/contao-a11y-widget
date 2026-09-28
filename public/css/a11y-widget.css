@@ -1,3 +1,50 @@
+/*
+ * Farben als CSS-Variablen – im Theme überschreibbar, z. B.:
+ * .a11y-widget { --a11y-fab-bg: #c00; --a11y-accent: #c00; }
+ * Die Akzentfarbe aus dem Backend kommt als --a11y-custom-accent(-contrast) am Widget an.
+ */
+.a11y-widget {
+    --a11y-fab-bg: var(--a11y-custom-accent, #4D58FF);
+    --a11y-fab-text: var(--a11y-custom-accent-contrast, #fff);
+    --a11y-accent: var(--a11y-custom-accent, #4D58FF);
+    --a11y-accent-contrast: var(--a11y-custom-accent-contrast, #fff);
+    --a11y-bg: #fff;
+    --a11y-text: #2b3136;
+    --a11y-border: rgba(0, 0, 0, 0.15);
+    --a11y-divider: rgba(0, 0, 0, 0.08);
+    /* ≥ 3:1 Kontrast zum Panel-Hintergrund (WCAG 1.4.11) */
+    --a11y-track: #6b7280;
+    --a11y-knob: #fff;
+    --a11y-focus: #ffd54f;
+    --a11y-focus-contrast: #1a1a1a;
+}
+
+/* Dunkles Farbschema: per Backend-Einstellung, per Theme-Klasse body.dark-mode oder automatisch per System */
+.a11y-widget--dark,
+body.dark-mode .a11y-widget {
+    --a11y-accent: var(--a11y-custom-accent, #8b93ff);
+    --a11y-accent-contrast: var(--a11y-custom-accent-contrast, #1a1a1a);
+    --a11y-bg: #2b3136;
+    --a11y-text: #fefefe;
+    --a11y-border: rgba(255, 255, 255, 0.2);
+    --a11y-divider: rgba(255, 255, 255, 0.12);
+    --a11y-track: #9ca3af;
+    --a11y-knob: #1a1a1a;
+}
+
+@media (prefers-color-scheme: dark) {
+    .a11y-widget--auto {
+        --a11y-accent: var(--a11y-custom-accent, #8b93ff);
+        --a11y-accent-contrast: var(--a11y-custom-accent-contrast, #1a1a1a);
+        --a11y-bg: #2b3136;
+        --a11y-text: #fefefe;
+        --a11y-border: rgba(255, 255, 255, 0.2);
+        --a11y-divider: rgba(255, 255, 255, 0.12);
+        --a11y-track: #9ca3af;
+        --a11y-knob: #1a1a1a;
+    }
+}
+
 /* Buttons im Widget neutralisieren, ohne Theme-Stile per Spezifität zu übertrumpfen */
 :where(.a11y-widget) button {
     margin: 0;
@@ -13,9 +60,9 @@
 [data-a11y-fab]:focus-visible,
 [data-a11y-panel] .a11y-btn:focus-visible,
 .a11y-toggle input:focus-visible {
-    outline: 0.1875rem solid #ffd54f;
+    outline: 0.1875rem solid var(--a11y-focus);
     outline-offset: 0.125rem;
-    box-shadow: 0 0 0 0.4375rem #1a1a1a;
+    box-shadow: 0 0 0 0.4375rem var(--a11y-focus-contrast);
 }
 
 /* Nur für Screenreader sichtbar */
@@ -42,8 +89,8 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: #4D58FF;
-    color: #fff;
+    background: var(--a11y-fab-bg);
+    color: var(--a11y-fab-text);
     cursor: pointer;
     box-shadow: 0 0.375rem 1.125rem rgba(0, 0, 0, 0.2);
     z-index: 10000;
@@ -52,8 +99,11 @@
 }
 
 [data-a11y-fab]:hover {
-    background-color: rgba(77, 88, 255, 0.9);
-    transition-duration: 0.3s;
+    filter: brightness(1.1);
+}
+
+.a11y-widget--left [data-a11y-fab] {
+    inset: auto auto 1rem 1rem;
 }
 
 /* Icon im FAB (falls SVG verwendet wird) */
@@ -65,14 +115,9 @@
 
 /* Seitenpanel */
 [data-a11y-panel] {
-    background: #fff;
-    color: #2b3136;
+    background: var(--a11y-bg);
+    color: var(--a11y-text);
     box-shadow: -1rem 0 2.5rem rgba(0, 0, 0, 0.18);
-}
-
-body.dark-mode [data-a11y-panel] {
-    background: #2b3136;
-    color: #fefefe;
 }
 
 /* Panel als natives <dialog>: Fokusfalle, Esc und inerte Seite kommen vom Browser */
@@ -98,6 +143,22 @@ dialog[data-a11y-panel][open] {
 @starting-style {
     dialog[data-a11y-panel][open] {
         transform: translateX(100%);
+    }
+}
+
+.a11y-widget--left dialog[data-a11y-panel] {
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+    box-shadow: 1rem 0 2.5rem rgba(0, 0, 0, 0.18);
+}
+
+.a11y-widget--left dialog[data-a11y-panel][open] {
+    transform: translateX(0);
+}
+
+@starting-style {
+    .a11y-widget--left dialog[data-a11y-panel][open] {
+        transform: translateX(-100%);
     }
 }
 
@@ -141,11 +202,7 @@ dialog[data-a11y-panel]::backdrop {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 1rem 1.125rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-body.dark-mode .a11y-panel__header {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid var(--a11y-divider);
 }
 
 .a11y-panel__title {
@@ -161,6 +218,12 @@ body.dark-mode .a11y-panel__header {
     min-height: 0;
     padding: 0.75rem 1.125rem 1.25rem;
     overflow: auto;
+}
+
+.a11y-panel__footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--a11y-divider);
 }
 
 .a11y-section {
@@ -183,17 +246,18 @@ body.dark-mode .a11y-panel__header {
     width: fit-content;
     padding: 0.5rem 0.75rem;
     border-radius: 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--a11y-border);
     cursor: pointer;
     user-select: none;
 }
 
-body.dark-mode .a11y-btn {
-    border-color: rgba(255, 255, 255, 0.2);
+.a11y-btn--block {
+    width: 100%;
+    justify-content: center;
 }
 
 .a11y-btn[aria-pressed=true] {
-    outline: 0.125rem solid #4D58FF;
+    outline: 0.125rem solid var(--a11y-accent);
     outline-offset: 0.125rem;
 }
 
@@ -214,12 +278,8 @@ body.dark-mode .a11y-btn {
     cursor: pointer;
     padding: 0.5rem 0.75rem;
     border-radius: 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--a11y-border);
     max-inline-size: 100%;
-}
-
-body.dark-mode .a11y-toggle {
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .a11y-toggle input {
@@ -230,17 +290,12 @@ body.dark-mode .a11y-toggle {
     block-size: 1.625rem;
     /* feste Höhe */
     border-radius: 999px;
-    /* ≥ 3:1 Kontrast zum Panel-Hintergrund (WCAG 1.4.11) */
-    background: #6b7280;
+    background: var(--a11y-track);
     position: relative;
     outline: none;
     transition: background 0.2s;
     flex: none;
     /* falls irgendwo Flex greift */
-}
-
-body.dark-mode .a11y-toggle input {
-    background: #9ca3af;
 }
 
 .a11y-toggle input::after {
@@ -251,19 +306,16 @@ body.dark-mode .a11y-toggle input {
     inline-size: 1rem;
     block-size: 1rem;
     border-radius: 50%;
-    background: #fff;
+    background: var(--a11y-knob);
     transition: transform 0.2s;
 }
 
 .a11y-toggle input:checked {
-    background: #4D58FF;
-}
-
-body.dark-mode .a11y-toggle input:checked {
-    background: #8b93ff;
+    background: var(--a11y-accent);
 }
 
 .a11y-toggle input:checked::after {
+    background: var(--a11y-accent-contrast);
     /* 44 - 26 = 18 → Weg des Knopfes */
     transform: translateX(1.125rem);
 }
@@ -286,8 +338,33 @@ body.dark-mode .a11y-toggle input:checked {
     }
 }
 
+/* Windows-Kontrastdesign: selbst gezeichnete Schalter mit Systemfarben sichtbar halten */
+@media (forced-colors: active) {
+    [data-a11y-fab] {
+        border: 2px solid ButtonText;
+    }
+
+    .a11y-toggle input {
+        forced-color-adjust: none;
+        background: Canvas;
+        border: 1px solid CanvasText;
+    }
+
+    .a11y-toggle input::after {
+        background: CanvasText;
+    }
+
+    .a11y-toggle input:checked {
+        background: Highlight;
+    }
+
+    .a11y-toggle input:checked::after {
+        background: HighlightText;
+    }
+}
+
 /* ---- Effekte auf der Seite ---- */
-/* Klassen sitzen an <html> (vor dem ersten Rendern gesetzt) und zusätzlich an <body> */
+/* Klassen sitzen an <html> (vor dem ersten Rendern gesetzt) und zusätzlich an <body>; das Widget selbst ist jeweils ausgenommen */
 
 /* Sans-serif */
 html.a11y-sans body {
@@ -306,14 +383,68 @@ html.a11y-highlight-links a:focus-visible {
     outline: 0.1875rem solid #ffd54f !important;
 }
 
-/* Lesemodus (ohne ablenkende Elemente) – das Widget selbst ist ausgenommen */
-html.a11y-reader-mode :is(img, picture, video, canvas, iframe, [data-decorative]):not([data-a11y-widget] *) {
-    display: none !important;
+/* Text-Abstände nach WCAG 1.4.12 */
+html.a11y-text-spacing body *:not([data-a11y-widget], [data-a11y-widget] *) {
+    line-height: 1.5 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.16em !important;
 }
 
-html.a11y-reader-mode * {
+html.a11y-text-spacing body p:not([data-a11y-widget] *) {
+    margin-bottom: 2em !important;
+}
+
+/* Abstände vererben sich sonst über den Modul-Wrapper ins Widget */
+html.a11y-text-spacing [data-a11y-widget] {
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+
+/* Hoher Kontrast: helle Schrift auf Schwarz, Links gelb */
+html.a11y-high-contrast,
+html.a11y-high-contrast body {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+html.a11y-high-contrast body *:not([data-a11y-widget], [data-a11y-widget] *) {
+    background-color: #000 !important;
+    background-image: none !important;
+    color: #fff !important;
+    border-color: #fff !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}
+
+html.a11y-high-contrast body a:not([data-a11y-widget] *),
+html.a11y-high-contrast body a:not([data-a11y-widget] *) * {
+    color: #ffeb3b !important;
+}
+
+html.a11y-high-contrast body a:not([data-a11y-widget] *) {
+    text-decoration: underline !important;
+}
+
+html.a11y-high-contrast body :is(button, input, select, textarea):not([data-a11y-widget] *) {
+    border: 1px solid #fff !important;
+}
+
+html.a11y-high-contrast body :focus-visible:not([data-a11y-widget] *) {
+    outline: 0.1875rem solid #ffeb3b !important;
+    outline-offset: 0.125rem;
+}
+
+/* Modus ohne Ablenkungen: Bewegung stoppen, dekorative Bilder ausblenden (Videos pausiert das JS) */
+html.a11y-reader-mode *,
+html.a11y-reader-mode *::before,
+html.a11y-reader-mode *::after {
     animation: none !important;
     transition: none !important;
+    scroll-behavior: auto !important;
+}
+
+html.a11y-reader-mode :is(img[alt=""], img[role=presentation], img[role=none], [data-decorative]):not([data-a11y-widget] *) {
+    display: none !important;
 }
 
 html.a11y-reader-mode [style*=background-image] {

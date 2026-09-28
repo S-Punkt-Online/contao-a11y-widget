@@ -93,3 +93,66 @@ $GLOBALS['TL_LANG']['tl_module']['a11y_sans_text'] = [
   'Simple font text',
   'Label of the switch. Leave empty to use the default text.'
 ];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_layout_legend'] = 'Appearance';
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_reset_label'] = [
+  '"Reset all" text',
+  'Label of the button that resets all settings. Leave empty to use the default text.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_position'] = [
+  'Position',
+  'Corner in which the round button appears. The panel opens on the same side.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_position_options'] = [
+  'bottom-right' => 'Bottom right',
+  'bottom-left' => 'Bottom left',
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_color_scheme'] = [
+  'Colour scheme',
+  'Light, dark or automatically matching the visitor\'s system setting.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_color_scheme_options'] = [
+  'light' => 'Light',
+  'dark' => 'Dark',
+  'auto' => 'Automatic (system)',
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_color'] = [
+  'Accent colour',
+  'Colour of the round button and active switches as hex value. Leave empty for blue (#4D58FF).'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_enable_spacing'] = [
+  'Show text spacing',
+  'Shows the option to increase line, word and letter spacing (WCAG 1.4.12).'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_spacing_title'] = [
+  'Text spacing heading',
+  'Heading of this section. Leave empty to use the default text.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_spacing_text'] = [
+  'Text spacing text',
+  'Label of the switch. Leave empty to use the default text.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_enable_contrast'] = [
+  'Show high contrast',
+  'Shows the option for a high contrast mode (light text on black).'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_contrast_title'] = [
+  'High contrast heading',
+  'Heading of this section. Leave empty to use the default text.'
+];
+
+$GLOBALS['TL_LANG']['tl_module']['a11y_contrast_text'] = [
+  'High contrast text',
+  'Label of the switch. Leave empty to use the default text.'
+];
