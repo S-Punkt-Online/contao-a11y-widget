@@ -5,3 +5,7 @@ services:
 
   Weba11y\ContaoA11yWidget\:
     resource: '../src/'
+    exclude:
+      - '../src/ContaoManager/'
+      - '../src/DependencyInjection/'
+      - '../src/ContaoA11yWidgetBundle.php'

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Weba11y\ContaoA11yWidget\ContaoManager;
 
 use Contao\CoreBundle\ContaoCoreBundle;
