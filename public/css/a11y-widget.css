@@ -1,12 +1,3 @@
-
-:root {
-    --a11y-font-scale: 100%;
-}
-
-html {
-    font-size: var(--a11y-font-scale);
-}
-
 /* Schwebende Aktionstaste (FAB) */
 [data-a11y-fab] {
     position: fixed;
@@ -50,7 +41,9 @@ html {
     height: 100dvh;
 
     transform: translateX(100%);
-    transition: transform 0.25s ease;
+    /* visibility nimmt das geschlossene Panel aus der Tab-Reihenfolge; Verzögerung erhält die Slide-out-Animation */
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
 
     background: #fff;
     color: #2b3136;
@@ -71,6 +64,8 @@ body.dark-mode [data-a11y-panel] {
 
 [data-a11y-panel][aria-hidden="false"] {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.25s ease, visibility 0s linear 0s;
 }
 
 .a11y-panel__header {
@@ -184,6 +179,11 @@ body.dark-mode .a11y-toggle {
     transition: transform 0.2s;
 }
 
+.a11y-toggle input:focus-visible {
+    outline: 0.1875rem solid #ffd54f;
+    outline-offset: 0.1875rem;
+}
+
 .a11y-toggle input:checked {
     background: #4D58FF;
 }
@@ -219,14 +219,8 @@ body.a11y-highlight-links a:focus-visible {
     outline: 0.1875rem solid #ffd54f !important;
 }
 
-/* Lesemodus (ohne ablenkende Elemente) */
-body.a11y-reader-mode img,
-body.a11y-reader-mode picture,
-body.a11y-reader-mode video,
-body.a11y-reader-mode canvas,
-body.a11y-reader-mode iframe,
-body.a11y-reader-mode [data-decorative],
-body.a11y-reader-mode [aria-hidden=true] {
+/* Lesemodus (ohne ablenkende Elemente) – das Widget selbst ist ausgenommen */
+body.a11y-reader-mode :is(img, picture, video, canvas, iframe, [data-decorative]):not([data-a11y-widget] *) {
     display: none !important;
 }
 

@@ -21,18 +21,25 @@ document.addEventListener('DOMContentLoaded', function () {
 		const toggleLinks = $('[data-a11y-links]');
 		const toggleSans = $('[data-a11y-sans]');
 
-		const LS_KEY = 'a11y-settings-' + (widget.id || index);
+		// Einstellungen gelten seitenweit, daher ein fester Schlüssel für alle Widgets
+		const LS_KEY = 'a11y-settings';
+		const LEGACY_LS_KEY = 'a11y-settings-' + (widget.id || index);
 
 		const load = () => {
 			try {
-				return JSON.parse(localStorage.getItem(LS_KEY)) || {};
+				const raw = localStorage.getItem(LS_KEY) ?? localStorage.getItem(LEGACY_LS_KEY);
+				return JSON.parse(raw) || {};
 			} catch {
 				return {};
 			}
 		};
 
 		const save = (obj) => {
-			localStorage.setItem(LS_KEY, JSON.stringify(obj));
+			try {
+				localStorage.setItem(LS_KEY, JSON.stringify(obj));
+			} catch {
+				// Speicher nicht verfügbar (z. B. privater Modus) – Einstellungen gelten nur für diese Seite
+			}
 		};
 
 		const state = Object.assign({
@@ -42,8 +49,27 @@ document.addEventListener('DOMContentLoaded', function () {
 			sans: false
 		}, load());
 
+		const root = document.documentElement;
+		let baseFontSize = null;
+
+		// Skaliert relativ zur Theme-Schriftgröße, statt sie zu überschreiben
+		function applyFontSize() {
+			if (baseFontSize === null) {
+				root.style.removeProperty('font-size');
+				baseFontSize = parseFloat(getComputedStyle(root).fontSize);
+			}
+
+			root.style.setProperty('--a11y-font-scale', state.font + '%');
+
+			if (state.font === 100) {
+				root.style.removeProperty('font-size');
+			} else {
+				root.style.fontSize = (baseFontSize * state.font / 100) + 'px';
+			}
+		}
+
 		function applyState() {
-			document.documentElement.style.setProperty('--a11y-font-scale', state.font + '%');
+			applyFontSize();
 
 			document.body.classList.toggle('a11y-reader-mode', !!state.reader);
 			document.body.classList.toggle('a11y-highlight-links', !!state.links);
@@ -56,6 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		let lastFocus = null;
+
+		const isOpen = () => panel.getAttribute('aria-hidden') === 'false';
 
 		function openPanel() {
 			lastFocus = document.activeElement;
@@ -72,18 +100,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			}, 0);
 
 			document.addEventListener('keydown', onEsc);
-			backdrop.addEventListener('click', closePanel, { once: true });
 		}
 
 		function closePanel() {
-			if (lastFocus) {
-				lastFocus.focus();
+			if (!isOpen()) {
+				return;
 			}
+
 			panel.setAttribute('aria-hidden', 'true');
 			fab.setAttribute('aria-expanded', 'false');
 			delete backdrop.dataset.open;
 			backdrop.setAttribute('aria-hidden', 'true');
 			document.removeEventListener('keydown', onEsc);
+
+			if (lastFocus) {
+				lastFocus.focus();
+				lastFocus = null;
+			}
 		}
 
 		function onEsc(e) {
@@ -116,11 +149,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		onActivate(fab, () => {
-			const isHidden = panel.getAttribute('aria-hidden') !== 'false';
-			isHidden ? openPanel() : closePanel();
+			isOpen() ? closePanel() : openPanel();
 		});
 
 		onActivate(closeBtn, closePanel);
+		backdrop.addEventListener('click', closePanel);
 
 		onActivate(fontInc, () => changeFont(10));
 		onActivate(fontDec, () => changeFont(-10));

@@ -20,9 +20,6 @@ class A11yWidgetModuleController extends AbstractFrontendModuleController
   {
     $this->addAssets();
 
-    $GLOBALS['TL_CSS'][] = 'bundles/contaoa11ywidget/css/a11y-widget.css|static';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/contaoa11ywidget/js/a11y-widget.js|static';
-
     $template->widgetId = 'a11y-' . $model->id;
 
     $template->a11yTitle = $model->a11y_title ?: 'Zugänglichkeit';
