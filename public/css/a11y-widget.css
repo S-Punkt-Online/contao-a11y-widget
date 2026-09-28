@@ -1,9 +1,44 @@
+/* Buttons im Widget neutralisieren, ohne Theme-Stile per Spezifität zu übertrumpfen */
+:where(.a11y-widget) button {
+    margin: 0;
+    font: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+    color: inherit;
+    background: none;
+}
+
+/* Fokusrahmen: gelb mit dunkler Kontur – sichtbar auf hellen wie dunklen Hintergründen */
+[data-a11y-fab]:focus-visible,
+[data-a11y-panel] .a11y-btn:focus-visible,
+.a11y-toggle input:focus-visible {
+    outline: 0.1875rem solid #ffd54f;
+    outline-offset: 0.125rem;
+    box-shadow: 0 0 0 0.4375rem #1a1a1a;
+}
+
+/* Nur für Screenreader sichtbar */
+.a11y-sr-only {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Schwebende Aktionstaste (FAB) */
 [data-a11y-fab] {
     position: fixed;
     inset: auto 1rem 1rem auto;
     width: 2.5rem;
     height: 2.5rem;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
     display: grid;
     place-items: center;
@@ -15,46 +50,24 @@
     user-select: none;
     transition-duration: 0.3s;
 }
+
 [data-a11y-fab]:hover {
     background-color: rgba(77, 88, 255, 0.9);
     transition-duration: 0.3s;
 }
 
-[data-a11y-fab]:focus-visible {
-    outline: 0.1875rem solid #ffd54f;
-    outline-offset: 0.1875rem;
-}
-
 /* Icon im FAB (falls SVG verwendet wird) */
 [data-a11y-fab] svg {
+    display: block;
     width: 1.5rem;
     height: 1.5rem;
 }
 
 /* Seitenpanel */
 [data-a11y-panel] {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 380px;
-    max-width: 100%;
-    height: 100dvh;
-
-    transform: translateX(100%);
-    /* visibility nimmt das geschlossene Panel aus der Tab-Reihenfolge; Verzögerung erhält die Slide-out-Animation */
-    visibility: hidden;
-    transition: transform 0.25s ease, visibility 0s linear 0.25s;
-
     background: #fff;
     color: #2b3136;
-
     box-shadow: -1rem 0 2.5rem rgba(0, 0, 0, 0.18);
-
-    z-index: 10001;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
 }
 
 body.dark-mode [data-a11y-panel] {
@@ -62,16 +75,71 @@ body.dark-mode [data-a11y-panel] {
     color: #fefefe;
 }
 
-[data-a11y-panel][aria-hidden="false"] {
+/* Panel als natives <dialog>: Fokusfalle, Esc und inerte Seite kommen vom Browser */
+dialog[data-a11y-panel] {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 380px;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: none;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    transition: transform 0.25s ease, overlay 0.25s ease allow-discrete, display 0.25s ease allow-discrete;
+}
+
+dialog[data-a11y-panel][open] {
+    transform: translateX(0);
+}
+
+@starting-style {
+    dialog[data-a11y-panel][open] {
+        transform: translateX(100%);
+    }
+}
+
+dialog[data-a11y-panel]::backdrop {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+/* Panel aus älteren, angepassten Templates (<aside> + Backdrop-Div) */
+[data-a11y-panel]:not(dialog) {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    max-width: 100%;
+    height: 100dvh;
+    transform: translateX(100%);
+    /* visibility nimmt das geschlossene Panel aus der Tab-Reihenfolge; Verzögerung erhält die Slide-out-Animation */
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+[data-a11y-panel]:not(dialog)[aria-hidden="false"] {
     transform: translateX(0);
     visibility: visible;
     transition: transform 0.25s ease, visibility 0s linear 0s;
+}
+
+.a11y-panel__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .a11y-panel__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.75rem;
     padding: 1rem 1.125rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
@@ -81,11 +149,16 @@ body.dark-mode .a11y-panel__header {
 }
 
 .a11y-panel__title {
+    margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
+    line-height: 1.3;
+    color: inherit;
 }
 
 .a11y-panel__content {
+    flex: 1;
+    min-height: 0;
     padding: 0.75rem 1.125rem 1.25rem;
     overflow: auto;
 }
@@ -98,9 +171,11 @@ body.dark-mode .a11y-panel__header {
     margin: 0 0 0.5rem;
     font-size: 0.95rem;
     font-weight: 700;
+    line-height: 1.3;
+    color: inherit;
 }
 
-/* Buttons (Spans) */
+/* Buttons */
 .a11y-btn {
     display: inline-flex;
     align-items: center;
@@ -120,11 +195,6 @@ body.dark-mode .a11y-btn {
 .a11y-btn[aria-pressed=true] {
     outline: 0.125rem solid #4D58FF;
     outline-offset: 0.125rem;
-}
-
-.a11y-btn:focus-visible {
-    outline: 0.1875rem solid #ffd54f;
-    outline-offset: 0.1875rem;
 }
 
 .a11y-btn-group {
@@ -154,17 +224,23 @@ body.dark-mode .a11y-toggle {
 
 .a11y-toggle input {
     appearance: none;
+    margin: 0;
     inline-size: 2.75rem;
     /* feste Breite */
     block-size: 1.625rem;
     /* feste Höhe */
     border-radius: 999px;
-    background: #bbb;
+    /* ≥ 3:1 Kontrast zum Panel-Hintergrund (WCAG 1.4.11) */
+    background: #6b7280;
     position: relative;
     outline: none;
     transition: background 0.2s;
     flex: none;
     /* falls irgendwo Flex greift */
+}
+
+body.dark-mode .a11y-toggle input {
+    background: #9ca3af;
 }
 
 .a11y-toggle input::after {
@@ -179,13 +255,12 @@ body.dark-mode .a11y-toggle {
     transition: transform 0.2s;
 }
 
-.a11y-toggle input:focus-visible {
-    outline: 0.1875rem solid #ffd54f;
-    outline-offset: 0.1875rem;
-}
-
 .a11y-toggle input:checked {
     background: #4D58FF;
+}
+
+body.dark-mode .a11y-toggle input:checked {
+    background: #8b93ff;
 }
 
 .a11y-toggle input:checked::after {
@@ -201,44 +276,54 @@ body.dark-mode .a11y-toggle {
     /* bricht sehr lange Wörter */
 }
 
+@media (prefers-reduced-motion: reduce) {
+    [data-a11y-fab],
+    [data-a11y-panel],
+    [data-a11y-backdrop],
+    .a11y-toggle input,
+    .a11y-toggle input::after {
+        transition: none !important;
+    }
+}
+
 /* ---- Effekte auf der Seite ---- */
+/* Klassen sitzen an <html> (vor dem ersten Rendern gesetzt) und zusätzlich an <body> */
+
 /* Sans-serif */
-body.a11y-sans {
+html.a11y-sans body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, sans-serif !important;
 }
 
 /* Links hervorheben */
-body.a11y-highlight-links a {
+html.a11y-highlight-links a {
     text-decoration: underline !important;
     text-underline-offset: 0.125rem;
     font-weight: 700;
     outline-offset: 0.125rem;
 }
 
-body.a11y-highlight-links a:focus-visible {
+html.a11y-highlight-links a:focus-visible {
     outline: 0.1875rem solid #ffd54f !important;
 }
 
 /* Lesemodus (ohne ablenkende Elemente) – das Widget selbst ist ausgenommen */
-body.a11y-reader-mode :is(img, picture, video, canvas, iframe, [data-decorative]):not([data-a11y-widget] *) {
+html.a11y-reader-mode :is(img, picture, video, canvas, iframe, [data-decorative]):not([data-a11y-widget] *) {
     display: none !important;
 }
 
-body.a11y-reader-mode * {
+html.a11y-reader-mode * {
     animation: none !important;
     transition: none !important;
 }
 
-body.a11y-reader-mode [style*=background-image] {
+html.a11y-reader-mode [style*=background-image] {
     background-image: none !important;
 }
 
-/* Backdrop zum Schließen bei Klick außerhalb */
+/* Backdrop älterer Templates zum Schließen bei Klick außerhalb */
 [data-a11y-backdrop] {
     position: fixed;
     inset: 0;
-    backdrop-filter: blur(0);
-    /* 0 genügt; px nicht nötig */
     background: rgba(0, 0, 0, 0);
     opacity: 0;
     pointer-events: none;
